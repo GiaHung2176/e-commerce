@@ -19,7 +19,7 @@ public class Category {
     private String description;
 
     // Quan hệ 1-Nhiều với Product
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category")
     @JsonIgnore 
     private List<Product> products;
 

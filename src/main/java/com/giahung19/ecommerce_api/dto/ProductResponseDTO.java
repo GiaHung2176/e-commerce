@@ -1,17 +1,17 @@
 package com.giahung19.ecommerce_api.dto;
-
+import java.math.BigDecimal;
 
 public class ProductResponseDTO {
     
     private Long id;
     private Long categoryId;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Integer stockQuantity;
 
     public ProductResponseDTO() {}
 
-    public ProductResponseDTO(Long id,Long categoryId,String name, Double price, Integer stockQuantity) {
+    public ProductResponseDTO(Long id,Long categoryId,String name, BigDecimal price, Integer stockQuantity) {
         this.id=id;
         this.categoryId=categoryId;
         this.name = name;
@@ -43,11 +43,11 @@ public class ProductResponseDTO {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

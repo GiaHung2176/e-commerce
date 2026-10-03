@@ -1,9 +1,12 @@
 package com.giahung19.ecommerce_api.dto;
 
+import java.math.BigDecimal;
+
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+
 
 public class ProductRequestDTO {
     
@@ -13,17 +16,18 @@ public class ProductRequestDTO {
     @NotBlank (message = "Name of product not blank")
     private String name;
 
+    @NotNull (message = "Price is not null")
+    @DecimalMin (value="0.0",inclusive = false) 
+    private BigDecimal price;
+
+
     @NotNull 
-    @Positive 
-    private Double price;
-
-
     @Min (value = 0)
     private Integer stockQuantity;
 
     public ProductRequestDTO() {}
 
-    public ProductRequestDTO(Long categoryId,String name, Double price, Integer stockQuantity) {
+    public ProductRequestDTO(Long categoryId,String name, BigDecimal price, Integer stockQuantity) {
         this.categoryId=categoryId;
         this.name = name;
         this.price = price;
@@ -46,11 +50,11 @@ public class ProductRequestDTO {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

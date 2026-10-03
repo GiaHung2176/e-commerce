@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.giahung19.ecommerce_api.dto.*;
 import com.giahung19.ecommerce_api.service.ProductService;
+ 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import tools.jackson.databind.json.JsonMapper;
 import java.util.*;
 import org.springframework.data.domain.Page;
-
-
+import com.giahung19.ecommerce_api.exception.*;
+import jakarta.validation.Validation;
 
 @RequestMapping ("/api/products")
 @RestController 
@@ -27,7 +29,7 @@ public class ProductController {
     }
 
     @GetMapping 
-     public ResponseEntity<Page<ProductResponseDTO>> findAll(
+    public ResponseEntity<Page<ProductResponseDTO>> findAll(
         @RequestParam (defaultValue = "0") int page,
         @RequestParam (defaultValue = "10") int size,
         @RequestParam (defaultValue = "id") String SortBy,
@@ -54,19 +56,30 @@ public class ProductController {
         ProductResponseDTO updateProduct =productService.update(id, requestDTO);
         return ResponseEntity.ok(updateProduct);
     }
+    private void validateProductPatch(ProductRequestDTO requestDTO) {
+        Set<ConstraintViolation<ProductRequestDTO>> violations = Validation
+            .buildDefaultValidatorFactory()
+            .getValidator()
+            .validate(requestDTO);
 
+        if (!violations.isEmpty()) {
+            String errorMessage = violations.iterator().next().getMessage();
+            throw new BadRequestException(errorMessage);
+        }
+    }
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> patchProduct(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
         
         if (patchPayload.containsKey("id")) {
-            throw new RuntimeException("Product id not allowed in request body");
+            throw new BadRequestException("Product id not allowed in request body");
         }
 
         ProductResponseDTO currentDTO = productService.findById(id);
         ProductResponseDTO patchedDTO = jsonMapper.updateValue(currentDTO, patchPayload);
         ProductRequestDTO requestDTO = new ProductRequestDTO(patchedDTO.getCategoryId(),patchedDTO.getName(),patchedDTO.getPrice(),patchedDTO.getStockQuantity());
-        ProductResponseDTO updatedCategory = productService.update(id, requestDTO);
-        return ResponseEntity.ok(updatedCategory);
+        validateProductPatch(requestDTO);
+        ProductResponseDTO updatedProduct = productService.update(id, requestDTO);
+        return ResponseEntity.ok(updatedProduct);
     }  
 
     @DeleteMapping ("/{id}")
@@ -75,6 +88,5 @@ public class ProductController {
         productService.deleteById(id);
         return ResponseEntity.ok("Deleted product with id: " + id);
     }
-
 
 }

@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.giahung19.ecommerce_api.service.*;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import tools.jackson.databind.json.JsonMapper;
 import java.util.*;
 import com.giahung19.ecommerce_api.dto.CategoryRequestDTO;
 import com.giahung19.ecommerce_api.dto.CategoryResponseDTO;
+import com.giahung19.ecommerce_api.exception.BadRequestException;
+import jakarta.validation.Validation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -55,24 +58,34 @@ public class CategoryController {
         CategoryResponseDTO updateCategory =categoryService.update(id, requestDTO);
         return ResponseEntity.ok(updateCategory);
     }
+    private void validateCategoryPatch(CategoryRequestDTO requestDTO) {
+        Set<ConstraintViolation<CategoryRequestDTO>> violations = Validation
+            .buildDefaultValidatorFactory()
+            .getValidator()
+            .validate(requestDTO);
 
+        if (!violations.isEmpty()) {
+            String errorMessage = violations.iterator().next().getMessage();
+            throw new BadRequestException(errorMessage);
+        }
+}
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> patchCategory(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
         
         if (patchPayload.containsKey("id")) {
-            throw new RuntimeException("Category id not allowed in request body");
+            throw new BadRequestException("Category id not allowed in request body");
         }
 
         CategoryResponseDTO currentDTO = categoryService.findById(id);
         CategoryResponseDTO patchedDTO = jsonMapper.updateValue(currentDTO, patchPayload);
         CategoryRequestDTO requestDTO = new CategoryRequestDTO(patchedDTO.getName(), patchedDTO.getDescription());
+        validateCategoryPatch(requestDTO);
         CategoryResponseDTO updatedCategory = categoryService.update(id, requestDTO);
         return ResponseEntity.ok(updatedCategory);
     }   
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
-        categoryService.findById(id);
         categoryService.deleteById(id);
         return ResponseEntity.ok("Deleted category with id: " + id);
     }
