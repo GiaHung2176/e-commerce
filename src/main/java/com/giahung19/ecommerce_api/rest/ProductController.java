@@ -36,10 +36,10 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponseDTO>> findAll(
         @RequestParam (defaultValue = "0") int page,
         @RequestParam (defaultValue = "10") int size,
-        @RequestParam (defaultValue = "id") String SortBy,
-        @RequestParam (defaultValue = "asc") String SortDir){
+        @RequestParam (defaultValue = "id") String sortBy,
+        @RequestParam (defaultValue = "asc") String sortDir){
         
-        Page<ProductResponseDTO> products =productService.findAll(page, size, SortBy, SortDir);
+        Page<ProductResponseDTO> products =productService.findAll(page, size, sortBy, sortDir);
         return ResponseEntity.ok(products);
     }
 
