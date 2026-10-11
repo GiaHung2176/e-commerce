@@ -14,9 +14,12 @@ import java.util.*;
 import org.springframework.data.domain.Page;
 import com.giahung19.ecommerce_api.exception.*;
 import jakarta.validation.Validation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Product", description = "Quản lý sản phẩm")
 @RequestMapping ("/api/products")
-@RestController 
+@RestController
 public class ProductController {
     
     private final ProductService productService;
@@ -28,7 +31,8 @@ public class ProductController {
         this.productService=productService;
     }
 
-    @GetMapping 
+    @Operation(summary = "Lấy danh sách sản phẩm, có phân trang và sắp xếp")
+    @GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> findAll(
         @RequestParam (defaultValue = "0") int page,
         @RequestParam (defaultValue = "10") int size,
@@ -39,18 +43,21 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @Operation(summary = "Lấy chi tiết một sản phẩm theo id")
     @GetMapping ("/{id}")
     public ResponseEntity<ProductResponseDTO> findById(@PathVariable Long id){
         ProductResponseDTO productResponseDTO =productService.findById(id);
         return ResponseEntity.ok(productResponseDTO);
     }
 
-    @PostMapping 
+    @Operation(summary = "Tạo sản phẩm mới")
+    @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
         ProductResponseDTO createProduct =productService.save(requestDTO);
         return new ResponseEntity<>(createProduct,HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Cập nhật toàn bộ thông tin sản phẩm")
     @PutMapping ("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDTO requestDTO){
         ProductResponseDTO updateProduct =productService.update(id, requestDTO);
@@ -67,6 +74,7 @@ public class ProductController {
             throw new BadRequestException(errorMessage);
         }
     }
+    @Operation(summary = "Cập nhật một phần thông tin sản phẩm")
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> patchProduct(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
         
@@ -82,9 +90,9 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }  
 
+    @Operation(summary = "Xóa sản phẩm theo id")
     @DeleteMapping ("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        productService.findById(id);
         productService.deleteById(id);
         return ResponseEntity.ok("Deleted product with id: " + id);
     }

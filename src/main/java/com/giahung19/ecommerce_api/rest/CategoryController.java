@@ -21,9 +21,12 @@ import com.giahung19.ecommerce_api.exception.BadRequestException;
 import jakarta.validation.Validation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
-@RestController 
+@Tag(name = "Category", description = "Quản lý danh mục sản phẩm")
+@RestController
 @RequestMapping ("/api/categories")
 public class CategoryController {
     private final CategoryService categoryService;
@@ -35,24 +38,28 @@ public class CategoryController {
         this.jsonMapper=jsonMapper;
     }
 
+    @Operation(summary = "Lấy danh sách tất cả danh mục")
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> findAll(){
         List<CategoryResponseDTO> list=categoryService.findAll();
         return ResponseEntity.ok(list);
     }
 
+    @Operation(summary = "Lấy chi tiết một danh mục theo id")
     @GetMapping ("/{id}")
     public ResponseEntity<CategoryResponseDTO> findById(@PathVariable Long id){
         CategoryResponseDTO categoryResponseDTO =categoryService.findById(id);
         return ResponseEntity.ok(categoryResponseDTO);
     }
 
+    @Operation(summary = "Tạo danh mục mới")
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
         CategoryResponseDTO createCategory =categoryService.save(requestDTO);
         return new ResponseEntity<>(createCategory,HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Cập nhật toàn bộ thông tin danh mục")
     @PutMapping ("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequestDTO requestDTO){
         CategoryResponseDTO updateCategory =categoryService.update(id, requestDTO);
@@ -69,6 +76,7 @@ public class CategoryController {
             throw new BadRequestException(errorMessage);
         }
 }
+    @Operation(summary = "Cập nhật một phần thông tin danh mục")
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> patchCategory(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
         
@@ -84,6 +92,7 @@ public class CategoryController {
         return ResponseEntity.ok(updatedCategory);
     }   
 
+    @Operation(summary = "Xóa danh mục theo id")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
