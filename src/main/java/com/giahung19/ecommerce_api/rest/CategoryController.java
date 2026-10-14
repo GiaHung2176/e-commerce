@@ -18,7 +18,8 @@ import java.util.*;
 import com.giahung19.ecommerce_api.dto.CategoryRequestDTO;
 import com.giahung19.ecommerce_api.dto.CategoryResponseDTO;
 import com.giahung19.ecommerce_api.exception.BadRequestException;
-import jakarta.validation.Validation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,11 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class CategoryController {
     private final CategoryService categoryService;
     private final JsonMapper jsonMapper;
+    private final Validator validator;
 
-    @Autowired 
-    public CategoryController (CategoryService categoryService,JsonMapper jsonMapper){
+    @Autowired
+    public CategoryController (CategoryService categoryService,JsonMapper jsonMapper,Validator validator){
         this.categoryService=categoryService;
         this.jsonMapper=jsonMapper;
+        this.validator=validator;
     }
 
     @Operation(summary = "Lấy danh sách tất cả danh mục")
@@ -66,16 +69,11 @@ public class CategoryController {
         return ResponseEntity.ok(updateCategory);
     }
     private void validateCategoryPatch(CategoryRequestDTO requestDTO) {
-        Set<ConstraintViolation<CategoryRequestDTO>> violations = Validation
-            .buildDefaultValidatorFactory()
-            .getValidator()
-            .validate(requestDTO);
-
+        Set<ConstraintViolation<CategoryRequestDTO>> violations = validator.validate(requestDTO);
         if (!violations.isEmpty()) {
-            String errorMessage = violations.iterator().next().getMessage();
-            throw new BadRequestException(errorMessage);
+            throw new ConstraintViolationException(violations);
         }
-}
+    }
     @Operation(summary = "Cập nhật một phần thông tin danh mục")
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> patchCategory(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {

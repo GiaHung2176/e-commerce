@@ -6,16 +6,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.giahung19.ecommerce_api.dto.*;
 import com.giahung19.ecommerce_api.service.ProductService;
- 
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import tools.jackson.databind.json.JsonMapper;
 import java.util.*;
 import org.springframework.data.domain.Page;
 import com.giahung19.ecommerce_api.exception.*;
-import jakarta.validation.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Validator;
 
 @Tag(name = "Product", description = "Quản lý sản phẩm")
 @RequestMapping ("/api/products")
@@ -24,11 +24,13 @@ public class ProductController {
     
     private final ProductService productService;
     private final JsonMapper jsonMapper;
+    private final Validator validator;
 
     @Autowired 
-    public ProductController (ProductService productService,JsonMapper jsonMapper){
+    public ProductController (ProductService productService,JsonMapper jsonMapper,Validator validator){
         this.jsonMapper=jsonMapper;
         this.productService=productService;
+        this.validator=validator;
     }
 
     @Operation(summary = "Lấy danh sách sản phẩm, có phân trang và sắp xếp")
@@ -64,14 +66,9 @@ public class ProductController {
         return ResponseEntity.ok(updateProduct);
     }
     private void validateProductPatch(ProductRequestDTO requestDTO) {
-        Set<ConstraintViolation<ProductRequestDTO>> violations = Validation
-            .buildDefaultValidatorFactory()
-            .getValidator()
-            .validate(requestDTO);
-
+        Set<ConstraintViolation<ProductRequestDTO>> violations = validator.validate(requestDTO);
         if (!violations.isEmpty()) {
-            String errorMessage = violations.iterator().next().getMessage();
-            throw new BadRequestException(errorMessage);
+            throw new ConstraintViolationException(violations);
         }
     }
     @Operation(summary = "Cập nhật một phần thông tin sản phẩm")

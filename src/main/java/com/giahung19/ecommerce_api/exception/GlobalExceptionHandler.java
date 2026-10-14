@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import java.util.List;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -82,5 +84,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exc) {
         log.error("Unexpected error", exc);
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+    }
+
+    @ExceptionHandler (ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException (ConstraintViolationException exc) {
+        Set <ConstraintViolation<?>> fieldErrors= exc.getConstraintViolations();
+        List<FieldErrorDetail> fieldErrorsDetail = fieldErrors.stream()
+                .map(x -> new FieldErrorDetail(x.getPropertyPath().toString(), x.getMessage()))
+                .toList();
+        ErrorResponse errorResponse =new ErrorResponse(HttpStatus.BAD_REQUEST.value(),"Validation failed",LocalDateTime.now(),fieldErrorsDetail);
+    
+        return new ResponseEntity<> (errorResponse,HttpStatus.BAD_REQUEST);
     }
 }

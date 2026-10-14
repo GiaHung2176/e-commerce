@@ -34,3 +34,7 @@ build/
 
 
 src/main/resources/application.properties
+
+CLAUDE.md
+
+docs/
