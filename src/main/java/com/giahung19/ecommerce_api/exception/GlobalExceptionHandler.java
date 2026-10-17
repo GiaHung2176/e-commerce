@@ -19,6 +19,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.*;
+import org.springframework.security.access.AccessDeniedException;
+
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -103,4 +106,10 @@ public class GlobalExceptionHandler {
     
         return new ResponseEntity<> (errorResponse,HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException exc) {
+        return build(HttpStatus.FORBIDDEN, "Bạn không có quyền truy cập tài nguyên này");
+    }
+
 }
