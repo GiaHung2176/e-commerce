@@ -19,6 +19,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration 
 @EnableWebSecurity 
 public class SecurityConfig {
+
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,JwtAccessDeniedHandler jwtAccessDeniedHandler){
+        this.jwtAuthenticationEntryPoint=jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler=jwtAccessDeniedHandler;
+    }
+    
+
     @Bean 
     public SecurityFilterChain filterChain (HttpSecurity http,
                                             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
@@ -26,6 +36,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session 
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception ->exception
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                    .accessDeniedHandler(jwtAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/**","/swagger-ui/**","/v3/api-docs/**").permitAll()
                     .anyRequest().authenticated())
