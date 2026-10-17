@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.giahung19.ecommerce_api.service.*;
 import jakarta.validation.ConstraintViolation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import tools.jackson.databind.json.JsonMapper;
 import java.util.*;
@@ -55,6 +56,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tạo danh mục mới")
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
@@ -62,6 +64,7 @@ public class CategoryController {
         return new ResponseEntity<>(createCategory,HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cập nhật toàn bộ thông tin danh mục")
     @PutMapping ("/{id}")
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequestDTO requestDTO){
@@ -74,13 +77,15 @@ public class CategoryController {
             throw new ConstraintViolationException(violations);
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cập nhật một phần thông tin danh mục")
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> patchCategory(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
         
         if (patchPayload.containsKey("id")) {
             throw new BadRequestException("Category id not allowed in request body");
-        }
+        } 
 
         CategoryResponseDTO currentDTO = categoryService.findById(id);
         CategoryResponseDTO patchedDTO = jsonMapper.updateValue(currentDTO, patchPayload);
@@ -90,6 +95,7 @@ public class CategoryController {
         return ResponseEntity.ok(updatedCategory);
     }   
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Xóa danh mục theo id")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {

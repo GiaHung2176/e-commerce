@@ -3,6 +3,7 @@ package com.giahung19.ecommerce_api.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.giahung19.ecommerce_api.dto.*;
 import com.giahung19.ecommerce_api.service.ProductService;
@@ -52,6 +53,7 @@ public class ProductController {
         return ResponseEntity.ok(productResponseDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Tạo sản phẩm mới")
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
@@ -59,18 +61,22 @@ public class ProductController {
         return new ResponseEntity<>(createProduct,HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cập nhật toàn bộ thông tin sản phẩm")
     @PutMapping ("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequestDTO requestDTO){
         ProductResponseDTO updateProduct =productService.update(id, requestDTO);
         return ResponseEntity.ok(updateProduct);
     }
+
     private void validateProductPatch(ProductRequestDTO requestDTO) {
         Set<ConstraintViolation<ProductRequestDTO>> violations = validator.validate(requestDTO);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cập nhật một phần thông tin sản phẩm")
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> patchProduct(@PathVariable Long id,@RequestBody Map<String, Object> patchPayload) {
@@ -87,6 +93,7 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }  
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Xóa sản phẩm theo id")
     @DeleteMapping ("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
