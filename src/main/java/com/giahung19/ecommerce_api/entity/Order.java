@@ -13,7 +13,8 @@ public class Order {
 
     private LocalDateTime orderDate;
 
-    private String status; // "PENDING", "COMPLETED", "CANCELLED"
+    @Enumerated (EnumType.STRING)
+    private OrderStatus status; // "PENDING", "COMPLETED", "CANCELLED"
 
     // Quan hệ N-1: Nhiều Order thuộc về 1 User
     @ManyToOne
@@ -26,7 +27,7 @@ public class Order {
 
     public Order() {}
 
-    public Order(LocalDateTime orderDate, String status) {
+    public Order(LocalDateTime orderDate, OrderStatus status) {
         this.orderDate = orderDate;
         this.status = status;
     }
@@ -37,6 +38,6 @@ public class Order {
     public LocalDateTime getOrderDate() { return orderDate; }
     public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
 }
