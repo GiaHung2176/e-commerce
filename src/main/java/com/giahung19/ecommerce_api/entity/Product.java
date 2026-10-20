@@ -1,7 +1,8 @@
 package com.giahung19.ecommerce_api.entity;
 
 import java.math.BigDecimal;
-
+import java.util.HashSet;
+import java.util.Set;
 import jakarta.persistence.*;
 
 @Entity
@@ -24,6 +25,14 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToMany
+    @JoinTable(
+        name = "product_tags",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags=new HashSet<>();
 
     public Product() {
     }
@@ -73,5 +82,29 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Set<Tag> getTags(){
+        return this.tags;
+    }
+    public void setTags(Set<Tag> tags){
+        this.tags=tags;
+    }
+
+    public boolean addTag(Tag tag){
+        if(tag!=null){
+            tags.add(tag);
+            tag.getProducts().add(this);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeTag(Tag tag){
+        if(tag!=null&&tags.remove(tag)){
+            tag.getProducts().remove(this);
+            return true;
+        }
+        return false;
     }
 }
