@@ -25,9 +25,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
 
+    @OneToOne (mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval =true)
+    private Profile profile;
+
     // Getter & Setter cho orders
     public List<Order> getOrders() { return orders; }
-    public void setOrders(List<Order> orders) { this.orders = orders; }
+    public void setOrders(List<Order> orders) { this.orders = orders;}
 
     public User() {}
 
@@ -48,4 +51,17 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public Profile getProfile() {return this.profile;}
+    public void setProfile(Profile profile) {
+        if (this.profile != null) {
+            this.profile.setUser(null);
+        }
+        this.profile = profile;
+        if (profile != null) {
+            profile.setUser(this);
+        }
+    }
+
+
 }
