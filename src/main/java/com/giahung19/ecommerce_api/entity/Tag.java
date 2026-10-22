@@ -17,9 +17,6 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    // TODO(human): quan hệ N-N ngược lại tới Product: Set<Product> products, khởi tạo = new HashSet<>().
-    //              Tag là inverse side hay owning side? Vì vậy @ManyToMany ở đây cần thuộc tính gì, trỏ tới field nào của Product?
-    //              Có nên cascade ở phía này không, vì sao?
     @ManyToMany (mappedBy = "tags")
     private Set<Product> products =new HashSet<>();
 

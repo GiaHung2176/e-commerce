@@ -23,8 +23,6 @@ public class Order {
     @JoinColumn(name = "user_id") // Tạo cột user_id làm khóa ngoại trong bảng orders
     private User user;
 
-    // TODO(human): quan hệ 1-N tới OrderItem: List<OrderItem> items, khởi tạo = new ArrayList<>().
-    //              Cần: mappedBy trỏ tới field nào của OrderItem? cascade loại nào? orphanRemoval có cần không, vì sao?
     @OneToMany (mappedBy = "order",cascade = {CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
     // Getter & Setter cho user

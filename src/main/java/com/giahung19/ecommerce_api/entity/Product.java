@@ -22,7 +22,7 @@ public class Product {
     private Integer stockQuantity;
 
     // Quan hệ Nhiều-1 với Category (Khóa ngoại)
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
