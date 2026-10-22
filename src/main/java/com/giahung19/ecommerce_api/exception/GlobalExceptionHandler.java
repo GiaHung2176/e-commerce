@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataConflictException.class)
     public ResponseEntity<ErrorResponse> handleDataConflictException(DataConflictException exc) {
         return build(HttpStatus.CONFLICT, exc.getMessage());
+    }
+
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ResponseEntity<ErrorResponse> handleConcurrencyFailureException(ConcurrencyFailureException exc) {
+        return build(HttpStatus.CONFLICT,"Data has been changed in another request,try again");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
