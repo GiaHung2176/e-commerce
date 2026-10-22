@@ -2,9 +2,14 @@ package com.giahung19.ecommerce_api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.*;
 import com.giahung19.ecommerce_api.entity.*;
+import com.giahung19.ecommerce_api.exception.*;
 import com.giahung19.ecommerce_api.repository.*;
+import jakarta.transaction.Transactional;
+import com.giahung19.ecommerce_api.dto.CreateOrderRequestDTO;
+import com.giahung19.ecommerce_api.dto.OrderItemRequestDTO;
 import com.giahung19.ecommerce_api.dto.OrderItemResponseDTO;
 import com.giahung19.ecommerce_api.dto.OrderResponseDTO;
 
@@ -12,10 +17,13 @@ import com.giahung19.ecommerce_api.dto.OrderResponseDTO;
 public class OrderServiceImpl implements OrderService {
 
     private OrderRepository orderRepository;
-
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository){
+    public OrderServiceImpl(OrderRepository orderRepository,UserRepository userRepository,ProductRepository productRepository){
         this.orderRepository=orderRepository;
+        this.productRepository=productRepository;
+        this.userRepository =userRepository;
     }
 
     private OrderItemResponseDTO convertToItemResponseDTO(OrderItem orderItem){
@@ -45,5 +53,35 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream()
                 .map(this::convertToResponseDTO)
                 .toList();
+    }
+
+    @Override 
+    @Transactional 
+    public OrderResponseDTO createOrder(String username, CreateOrderRequestDTO requestDTO){
+        User user =userRepository.findByUsername(username)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Order order =new Order(LocalDateTime.now(),OrderStatus.PENDING);
+        order.setUser(user);
+
+        for (OrderItemRequestDTO itemRequest :requestDTO.getItems()){
+            Product product = productRepository.findById(itemRequest.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Not found product"));
+            
+            if(product.getStockQuantity()<itemRequest.getQuantity()){
+                throw new BadRequestException("Current stock is less than request quantity or out of stock");
+            }
+
+            product.setStockQuantity(product.getStockQuantity()-itemRequest.getQuantity());
+
+            OrderItem orderItem =new OrderItem(itemRequest.getQuantity(),product.getPrice());
+            orderItem.setProduct(product);
+
+            order.addItem(orderItem);
+
+        }
+        Order savedOrder =orderRepository.save(order);  
+        OrderResponseDTO orderResponseDTO =convertToResponseDTO(savedOrder);
+        return orderResponseDTO;
     }
 }
