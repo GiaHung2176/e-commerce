@@ -8,4 +8,8 @@ public interface OrderService {
     List<OrderResponseDTO> findAll();
 
     OrderResponseDTO createOrder(String username, CreateOrderRequestDTO requestDTO);
+
+    List<OrderResponseDTO> findMyOrders(String username);
+
+    OrderResponseDTO cancelOrder(String username, Long orderId);
 }

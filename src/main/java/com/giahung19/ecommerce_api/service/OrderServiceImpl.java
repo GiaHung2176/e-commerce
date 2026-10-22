@@ -1,6 +1,7 @@
 package com.giahung19.ecommerce_api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -11,6 +12,7 @@ import com.giahung19.ecommerce_api.dto.CreateOrderRequestDTO;
 import com.giahung19.ecommerce_api.dto.OrderItemRequestDTO;
 import com.giahung19.ecommerce_api.dto.OrderItemResponseDTO;
 import com.giahung19.ecommerce_api.dto.OrderResponseDTO;
+
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -83,4 +85,28 @@ public class OrderServiceImpl implements OrderService {
         OrderResponseDTO orderResponseDTO =convertToResponseDTO(savedOrder);
         return orderResponseDTO;
     }
+
+    @Override
+    public List<OrderResponseDTO> findMyOrders(String username) {
+        List<Order> orders=orderRepository.findAllByUsernameWithItems(username);
+        return orders.stream()
+                .map(this::convertToResponseDTO)
+                .toList();
+    }
+
+    @Transactional 
+    @Override
+    public OrderResponseDTO cancelOrder(String username, Long orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Not found order"));
+        
+        if(!order.getUser().getUsername().equals(username)) throw new AccessDeniedException("Not allowed to access");
+        if(order.getStatus()!=OrderStatus.PENDING) throw new BadRequestException("Not allow this operation");
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        return convertToResponseDTO(order);
+    }
+
+
 }
