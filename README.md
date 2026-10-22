@@ -77,6 +77,24 @@ Lỗi validation trả về `400` kèm danh sách lỗi theo từng field:
 }
 ```
 
+## N+1 optimization for `GET /api/orders`
+
+Measured on seed data from [docs/seed-n-plus-1.sql](docs/seed-n-plus-1.sql): 5 orders, 2 items each, 5 users, 10 distinct products, 3 categories. Each figure is the number of SQL `select` statements counted from the Hibernate log for one request (authentication queries excluded).
+
+| Step | Change | Selects | Breakdown |
+|---|---|---|---|
+| Baseline | `findAll()` | 21 | 1 orders + 5 users + 5 order_items + 10 products |
+| 1 | `join fetch o.user` | 21 | 1 orders + 5 profiles + 5 order_items + 10 products |
+| 2 | add `join fetch o.items i join fetch i.product` | 6 | 1 combined + 5 profiles |
+| 3 | add `left join fetch u.profile` | 1 | 1 combined |
+
+Notes:
+
+- Step 1 did not reduce the total: `User` is now loaded by a query instead of by id, so its EAGER `profile` is loaded by 5 extra queries instead of a join.
+- `profile` uses `left join fetch`: an inner join would drop every order whose user has no profile (all seed users).
+- `category` is not fetched because the response DTO does not read it. Reading it would add one query per distinct category (3 here).
+
+
 ## Cấu trúc package
 
 Base package `com.giahung19.ecommerce_api`:
@@ -91,4 +109,4 @@ Base package `com.giahung19.ecommerce_api`:
 
 ## Trạng thái
 
-Đang phát triển. Tiếp theo: bảo mật với Spring Security và JWT, tối ưu truy vấn JPA, Docker và CI.
+Đang phát triển:Tối ưu truy vấn JPA, Docker và CI.
