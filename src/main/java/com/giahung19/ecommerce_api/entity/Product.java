@@ -34,6 +34,9 @@ public class Product {
     )
     private Set<Tag> tags=new HashSet<>();
 
+    @Version 
+    Long version;
+
     public Product() {
     }
 
@@ -106,5 +109,9 @@ public class Product {
             return true;
         }
         return false;
+    }
+
+    public Long getVersion(){
+        return this.version;
     }
 }
