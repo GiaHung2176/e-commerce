@@ -132,6 +132,26 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+		<plugin>
+    			<groupId>org.jacoco</groupId>
+    			<artifactId>jacoco-maven-plugin</artifactId>
+    			<version>0.8.13</version>
+    			<executions>
+        			<execution>
+            			<goals>
+                			<goal>prepare-agent</goal>   <!-- gắn "máy theo dõi" vào JVM chạy test -->
+            			</goals>
+        			</execution>
+        			<execution>
+            			<id>report</id>
+            			<phase>test</phase>              <!-- chạy ngay sau khi test xong -->
+            			<goals>
+                			<goal>report</goal>          <!-- xuất báo cáo HTML từ dữ liệu đã thu -->
+            			</goals>
+        			</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
