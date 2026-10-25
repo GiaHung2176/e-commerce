@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +23,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
+import com.giahung19.ecommerce_api.support.MySqlTestContainerConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Cố ý KHÔNG đặt @Transactional ở lớp test: mỗi luồng phải có transaction riêng và commit thật,
 // nếu không hai luồng sẽ không giẫm lên nhau như hai request thật.
-// Chạy trên DB thật (MySQL local), nên mỗi lượt tự dọn dữ liệu mình tạo ở @AfterEach.
+// Run on MySQL Testcontainer
 @SpringBootTest
+@ActiveProfiles("test")
+@Import(MySqlTestContainerConfig.class)
 class OrderConcurrencyTest {
 
     @Autowired
