@@ -6,15 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-
+import com.giahung19.ecommerce_api.support.MySqlTestContainerConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // Không đặt @Transactional ở lớp test: mỗi lần gọi repository là một transaction riêng,
 // nên hai lần findById trả về hai bản Product tách rời nhau, giống hai request khác nhau.
 @SpringBootTest
+@ActiveProfiles("test")
+@Import(MySqlTestContainerConfig.class)
 class ProductOptimisticLockingTest {
 
     @Autowired
