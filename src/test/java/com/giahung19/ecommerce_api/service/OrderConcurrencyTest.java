@@ -23,17 +23,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import com.giahung19.ecommerce_api.support.MySqlTestContainerConfig;
+import com.giahung19.ecommerce_api.support.PostgreSqlTestContainerConfig;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // Cố ý KHÔNG đặt @Transactional ở lớp test: mỗi luồng phải có transaction riêng và commit thật,
 // nếu không hai luồng sẽ không giẫm lên nhau như hai request thật.
-// Run on MySQL Testcontainer
+// Run on PostgreSQL Testcontainer
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(MySqlTestContainerConfig.class)
+@Import(PostgreSqlTestContainerConfig.class)
 class OrderConcurrencyTest {
 
     @Autowired

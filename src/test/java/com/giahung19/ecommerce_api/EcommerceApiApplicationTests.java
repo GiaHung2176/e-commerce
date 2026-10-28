@@ -1,6 +1,6 @@
 package com.giahung19.ecommerce_api;
 
-import com.giahung19.ecommerce_api.support.MySqlTestContainerConfig;
+import com.giahung19.ecommerce_api.support.PostgreSqlTestContainerConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(MySqlTestContainerConfig.class)
+@Import(PostgreSqlTestContainerConfig.class)
 class EcommerceApiApplicationTests {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	// 🧪 Test case 1: app khởi động được trên MySQL container trống (Flyway chạy, Hibernate validate khớp schema)
+	// 🧪 Test case 1: app khởi động được trên PostgreSQL container trống (Flyway chạy, Hibernate validate khớp schema)
 	@Test
 	void contextLoads() {
 	}
@@ -27,12 +27,12 @@ class EcommerceApiApplicationTests {
 	@Test
 	void flywayBaseline_ShouldBeAppliedAndCreateAllTables() {
 		Integer successfulMigrations = jdbcTemplate.queryForObject(
-				"SELECT COUNT(*) FROM flyway_schema_history WHERE version = '1' AND success = 1",
+				"SELECT COUNT(*) FROM flyway_schema_history WHERE version = '1' AND success = true",
 				Integer.class);
 		assertEquals(1, successfulMigrations);
 
 		Integer entityTables = jdbcTemplate.queryForObject(
-				"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() "
+				"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = current_schema() "
 						+ "AND table_name IN ('categories','users','tags','products','product_tags',"
 						+ "'profiles','orders','order_items')",
 				Integer.class);
