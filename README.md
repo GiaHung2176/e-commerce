@@ -1,6 +1,17 @@
 # E-commerce API
 
+[![CI](https://github.com/GiaHung2176/e-commerce/actions/workflows/ci.yml/badge.svg)](https://github.com/GiaHung2176/e-commerce/actions/workflows/ci.yml)
+
 REST API quản lý sản phẩm và danh mục cho hệ thống bán hàng, xây dựng bằng Spring Boot. Dự án học tập và showcase backend Java.
+
+## Demo
+
+- Swagger UI: https://ecommerce-api-wmy8.onrender.com/swagger-ui.html
+- Health check: https://ecommerce-api-wmy8.onrender.com/actuator/health
+
+Triển khai trên Render (gói miễn phí), lưu ý:
+- Sau 15 phút không có request, app tự ngủ; request đầu tiên sau đó có thể mất 30–60 giây để app khởi động lại.
+- Database PostgreSQL miễn phí của Render hết hạn sau khoảng 30 ngày, khi đó demo cần tạo lại database.
 
 ## Tech stack
 
@@ -142,4 +153,6 @@ Base package `com.giahung19.ecommerce_api`:
 
 ## Trạng thái
 
-Đang phát triển:Tối ưu truy vấn JPA, Docker và CI.
+Đã có: Docker, Docker Compose, CI bằng GitHub Actions, deploy lên Render, health check qua Actuator.
+
+Tiếp theo: ôn tập lại các phần đã học.
