@@ -5,6 +5,10 @@ services:
       POSTGRES_DB: ecommerce_db
       POSTGRES_USER: ecommerce
       POSTGRES_PASSWORD: ${DB_PASSWORD:?Thiếu DB_PASSWORD, copy .env.example thành .env rồi điền}
+    ports:
+      # Mở cổng ra máy để chạy app từ IDE (profile dev) nối vào DB này.
+      # Dùng 5433 vì 5432 có thể đã bị Postgres cài sẵn trên máy chiếm
+      - "5433:5432"
     volumes:
       # Lưu dữ liệu ra ngoài container, tắt container đi dữ liệu vẫn còn
       - postgres-data:/var/lib/postgresql/data
