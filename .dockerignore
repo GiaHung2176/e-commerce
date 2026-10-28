@@ -1,0 +1,11 @@
+# Không đưa vào build context: file build cũ, lịch sử git, file IDE
+target/
+.git/
+.idea/
+.vscode/
+*.iml
+HELP.md
+
+# Secrets: cấu hình thật đi vào container qua biến môi trường, không đóng vào image
+src/main/resources/application.properties
+src/main/resources/application-dev.properties
