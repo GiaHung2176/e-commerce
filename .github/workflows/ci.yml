@@ -30,3 +30,4 @@ jobs:
         env:
           # Giá trị giả chỉ dùng cho test, không phải secret thật
           JWT_SECRET: ci-test-only-secret-not-used-anywhere-else-0123456789
+          JWT_EXPIRATION_MS: 1800000
