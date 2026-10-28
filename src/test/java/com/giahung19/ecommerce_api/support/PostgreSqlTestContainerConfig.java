@@ -3,15 +3,15 @@ package com.giahung19.ecommerce_api.support;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.mysql.MySQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 
 @TestConfiguration(proxyBeanMethods = false)
-public class MySqlTestContainerConfig {
+public class PostgreSqlTestContainerConfig {
 
     @Bean
     @ServiceConnection
-    MySQLContainer mySqlContainer() {
-        return new MySQLContainer("mysql:8.4");
+    PostgreSQLContainer postgreSqlContainer() {
+        return new PostgreSQLContainer("postgres:16");
     }
 }

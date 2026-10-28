@@ -6,33 +6,66 @@ REST API quản lý sản phẩm và danh mục cho hệ thống bán hàng, xâ
 
 - Java 17
 - Spring Boot 4.1.x (Spring Web MVC, Spring Data JPA, Bean Validation)
-- MySQL 8
+- PostgreSQL 16 (schema quản lý bằng Flyway)
 - Maven
 - springdoc-openapi (Swagger UI)
+- Docker, Docker Compose
+- GitHub Actions (CI)
 
 ## Chạy dự án
 
-Yêu cầu: JDK 17, MySQL 8 đang chạy ở máy local.
+### Cách 1: Docker (một lệnh, không cần cài JDK hay database)
 
-1. Tạo file cấu hình từ file mẫu:
+Yêu cầu: Docker.
+
+1. Tạo file biến môi trường từ file mẫu rồi điền giá trị của bạn (`DB_PASSWORD`, `JWT_SECRET`). File `.env` nằm trong `.gitignore`, không commit:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Dựng app và database:
+
+   ```bash
+   docker compose up --build
+   ```
+
+3. Kiểm tra app: <http://localhost:8080/actuator/health> trả `{"status":"UP"}`.
+
+### Cách 2: Chạy app trên máy (dev)
+
+Yêu cầu: JDK 17, Docker (để chạy PostgreSQL).
+
+1. Tạo file cấu hình từ file mẫu. Cả hai file đều nằm trong `.gitignore`:
 
    ```bash
    cp src/main/resources/application.properties.example src/main/resources/application.properties
+   cp src/main/resources/application-dev.properties.example src/main/resources/application-dev.properties
    ```
 
-2. Mở `application.properties`, điền `spring.datasource.username` và `spring.datasource.password` của MySQL local. File này nằm trong `.gitignore`, không commit.
+2. Mở `application.properties` điền `jwt.secret`; mở `application-dev.properties` điền `spring.datasource.password` trùng với `DB_PASSWORD` trong `.env`.
 
-3. Chạy ứng dụng:
+3. Bật database (cổng `5433` trên máy), giữ terminal này mở:
+
+   ```bash
+   docker compose up postgres
+   ```
+
+4. Ở terminal khác, chạy ứng dụng:
 
    ```bash
    ./mvnw spring-boot:run
    ```
 
-4. Chạy test:
+   Trên Windows, nếu gặp lỗi `invalid value for parameter "TimeZone"`, đặt trước khi chạy (PowerShell): `$env:JAVA_TOOL_OPTIONS="-Duser.timezone=Asia/Ho_Chi_Minh"`.
 
-   ```bash
-   ./mvnw test
-   ```
+### Chạy test
+
+Test tích hợp dùng Testcontainers nên cần Docker đang chạy:
+
+```bash
+./mvnw test
+```
 
 Ứng dụng chạy tại `http://localhost:8080`.
 

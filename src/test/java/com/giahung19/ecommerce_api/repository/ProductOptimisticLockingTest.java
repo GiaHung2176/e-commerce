@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import com.giahung19.ecommerce_api.support.MySqlTestContainerConfig;
+import com.giahung19.ecommerce_api.support.PostgreSqlTestContainerConfig;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 // nên hai lần findById trả về hai bản Product tách rời nhau, giống hai request khác nhau.
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(MySqlTestContainerConfig.class)
+@Import(PostgreSqlTestContainerConfig.class)
 class ProductOptimisticLockingTest {
 
     @Autowired

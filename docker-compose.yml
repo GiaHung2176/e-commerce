@@ -1,15 +1,20 @@
 services:
-  mysql:
-    image: mysql:8
+  postgres:
+    image: postgres:16
     environment:
-      MYSQL_DATABASE: ecommerce_db
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Thiếu DB_PASSWORD, copy .env.example thành .env rồi điền}
+      POSTGRES_DB: ecommerce_db
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Thiếu DB_PASSWORD, copy .env.example thành .env rồi điền}
+    ports:
+      # Mở cổng ra máy để chạy app từ IDE (profile dev) nối vào DB này.
+      # Dùng 5433 vì 5432 có thể đã bị Postgres cài sẵn trên máy chiếm
+      - "5433:5432"
     volumes:
       # Lưu dữ liệu ra ngoài container, tắt container đi dữ liệu vẫn còn
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      # app chỉ khởi động khi MySQL đã sẵn sàng nhận kết nối
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$$MYSQL_ROOT_PASSWORD"]
+      # app chỉ khởi động khi Postgres đã sẵn sàng nhận kết nối
+      test: ["CMD-SHELL", "pg_isready -U ecommerce -d ecommerce_db"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -17,19 +22,19 @@ services:
   app:
     build: .
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      # Trong mạng của compose, app gọi MySQL bằng tên service "mysql", không phải localhost
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ecommerce_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
+      # Trong mạng của compose, app gọi Postgres bằng tên service "postgres", không phải localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecommerce_db
+      SPRING_DATASOURCE_USERNAME: ecommerce
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       JWT_SECRET: ${JWT_SECRET:?Thiếu JWT_SECRET, copy .env.example thành .env rồi điền}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-1800000}
 
 volumes:
-  mysql-data:
+  postgres-data:
